@@ -167,8 +167,9 @@ class Statistics:
             # exception (if there was one)
             obj["exception"] = None if exception is None else repr(exception)
 
-            if obj["size"] > 1024 and obj["method"].lower() == 'post':
-                obj['rtf'] = obj["response_time"] / ((obj["size"] - 44) // 2 / 16000.0)
+            if len(request.data) > 1024 and obj["method"].lower() == 'post':
+                raw_data_size = len(request.data) * 3 / 4.0
+                obj['rtf'] = obj["response_time"] / ((raw_data_size - 44) // 2 / 16000.0)
             else:
                 obj['rtf'] = 0
             """
