@@ -28,9 +28,21 @@ class StatisticsQueries:
                                        func.count(self.model.path).label("hits"),
                                        func.count(self.model.remote_address.distinct()).label("unique_hits"),
                                        func.max(self.model.date).label("last_requested"),
-                                       func.avg(self.model.response_time).label("average_response_time"),
-                                       func.avg(self.model.rtf).label("average_rtf")).group_by(
+                                       func.avg(self.model.response_time).label("average_response_time")).group_by(
                                            self.model.path).order_by(desc("hits")))
+
+        query = self._add_date_filter_to_query(query, start_date, end_date)
+
+        return query.all()
+
+    def get_rtf_routes_data(self, start_date: datetime.datetime, end_date: datetime.datetime) -> List:
+        query = (self.db.session.query(self.model.path,
+                                       func.count(self.model.path).label("hits"),
+                                       func.count(self.model.remote_address.distinct()).label("unique_hits"),
+                                       func.max(self.model.date).label("last_requested"),
+                                       func.avg(self.model.response_time).label("average_response_time"),
+                                       func.avg(self.model.rtf).label("average_rtf")).filter(
+                                           self.model.rtf > 0).group_by(self.model.path).order_by(desc("hits")))
 
         query = self._add_date_filter_to_query(query, start_date, end_date)
 

@@ -46,11 +46,33 @@
           <th>Unique Hits</th>
           <th>Last requested</th>
           <th>Avg. Duration</th>
-          <th>Avg. Rtf</th>
         </tr>
       </thead>
       <tbody>
         {%- for route in routes -%}
+        <tr>
+          <td><a href="{{url_for('statistics.index', path=route.path)}}">{{route.path}}</a></td>
+          <td>{{route.hits}}</td>
+          <td>{{route.unique_hits}}</td>
+          <td>{{route.last_requested.strftime("%Y-%m-%d %H:%M:%S")}}</td>
+          <td>{{route.average_response_time|round(5)}} s</td>
+        </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>URL</th>
+          <th>Hits</th>
+          <th>Unique Hits</th>
+          <th>Last requested</th>
+          <th>Avg. Duration</th>
+          <th>Avg. Rtf</th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for route in rtf_routes -%}
         <tr>
           <td><a href="{{url_for('statistics.index', path=route.path)}}">{{route.path}}</a></td>
           <td>{{route.hits}}</td>

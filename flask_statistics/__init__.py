@@ -71,6 +71,7 @@ class Statistics:
         # Overview for all routes
         if path is None:
             routes = self.api.get_routes_data(start_date, end_date)
+            rtf_routes = self.api.get_rtf_routes_data(start_date, end_date)
 
             user_chart_data = self.api.get_user_chart_data(start_date, end_date)
 
@@ -79,6 +80,7 @@ class Statistics:
 
             return render_template("flask_statistics_index.html",
                                    routes=routes,
+                                   rtf_routes=rtf_routes,
                                    hits=hits,
                                    unique_users=unique_users,
                                    user_chart_data=user_chart_data,
@@ -165,8 +167,10 @@ class Statistics:
             # exception (if there was one)
             obj["exception"] = None if exception is None else repr(exception)
 
-            if obj["size"] > 1024 and obj["method"].lower == 'post':
+            if obj["size"] > 1024 and obj["method"].lower() == 'post':
                 obj['rtf'] = obj["response_time"] / ((obj["size"] - 44) // 2 / 16000.0)
+            else:
+                obj['rtf'] = 0
             """
             # Gets geo data based of ip
             url = "https://freegeoip.app/json/{0}".format(request.remote_addr)
