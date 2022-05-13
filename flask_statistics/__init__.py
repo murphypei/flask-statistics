@@ -9,27 +9,18 @@ from typing import Callable
 
 
 class Statistics:
-    def __init__(
-        self,
-        app: Flask = None,
-        db: SQLAlchemy = None,
-        model: Model = None,
-        before_f: Callable = None,
-        **kwargs
-    ):
 
-        if (app is not None and db is not None
-                and model is not None):
+    def __init__(self,
+                 app: Flask = None,
+                 db: SQLAlchemy = None,
+                 model: Model = None,
+                 before_f: Callable = None,
+                 **kwargs):
+
+        if (app is not None and db is not None and model is not None):
             self.init_app(app, db, model, before_f, **kwargs)
 
-    def init_app(
-        self,
-        app: Flask,
-        db: SQLAlchemy,
-        model: Model,
-        before_f: Callable = None,
-        **kwargs
-    ) -> None:
+    def init_app(self, app: Flask, db: SQLAlchemy, model: Model, before_f: Callable = None, **kwargs) -> None:
         """Initalizes extensions."""
         self.app = app
         self.db = db
@@ -38,9 +29,7 @@ class Statistics:
         self.api = StatisticsQueries(self.db, self.model)
 
         # Config variables
-        self.date_span = self.app.config.get(
-            "STATISTICS_DEFAULT_DATE_SPAN", datetime.timedelta(days=7))
-
+        self.date_span = self.app.config.get("STATISTICS_DEFAULT_DATE_SPAN", datetime.timedelta(days=7))
 
         # Register function that runs before / after each request
         # These functions are used to collect the data
@@ -49,8 +38,7 @@ class Statistics:
         self.app.teardown_request(self.teardown_request)
 
         # Blueprint
-        self.blueprint = Blueprint("statistics", __name__, template_folder="./templates",
-                                   url_prefix="/statistics")
+        self.blueprint = Blueprint("statistics", __name__, template_folder="./templates", url_prefix="/statistics")
         self.blueprint.add_url_rule("/", "index", self.index_view)
         if before_f is not None:
             self.blueprint.before_request(before_f)
@@ -82,15 +70,12 @@ class Statistics:
 
         # Overview for all routes
         if path is None:
-            routes = self.api.get_routes_data(start_date,
-                                              end_date)
+            routes = self.api.get_routes_data(start_date, end_date)
 
-            user_chart_data = self.api.get_user_chart_data(start_date,
-                                                           end_date)
+            user_chart_data = self.api.get_user_chart_data(start_date, end_date)
 
             hits = sum([route.hits for route in routes])
-            unique_users = self.api.get_number_of_unique_visitors(start_date,
-                                                                 end_date)
+            unique_users = self.api.get_number_of_unique_visitors(start_date, end_date)
 
             return render_template("flask_statistics_index.html",
                                    routes=routes,
@@ -100,15 +85,10 @@ class Statistics:
                                    start_date=str(start_date.date()),
                                    end_date=str(end_date.date()))
 
-
         # Single stats for a specifc path
-        requests = self.api.get_requests_for_path(path,
-                                                  start_date,
-                                                  end_date)
+        requests = self.api.get_requests_for_path(path, start_date, end_date)
 
-        user_chart_data = self.api.get_user_chart_data(start_date,
-                                                       end_date,
-                                                       path)
+        user_chart_data = self.api.get_user_chart_data(start_date, end_date, path)
 
         return render_template("flask_statistics_single_view.html",
                                path=path,
@@ -117,9 +97,7 @@ class Statistics:
                                start_date=str(start_date.date()),
                                end_date=str(end_date.date()))
 
-    def before_request(
-        self
-    ) -> None:
+    def before_request(self) -> None:
         """Function that is called before a request is processed."""
 
         if self.disable_f():
@@ -133,10 +111,7 @@ class Statistics:
         # error code that is used when this happens
         g.request_status_code = 500
 
-    def after_request(
-        self,
-        response: Response
-    ) -> Response:
+    def after_request(self, response: Response) -> Response:
         """Function that is called after a request was processed."""
 
         if self.disable_f():
@@ -148,10 +123,7 @@ class Statistics:
 
         return response
 
-    def teardown_request(
-        self,
-        exception: Exception = None
-    ) -> None:
+    def teardown_request(self, exception: Exception = None) -> None:
         """Function that is called after a request, whether it was successful
         or not."""
 
@@ -180,9 +152,8 @@ class Statistics:
             # page that linked to requested page
             obj["referrer"] = request.referrer
             # browser and version
-            obj["browser"] = "{browser} {version}".format(
-                browser=request.user_agent.browser,
-                version=request.user_agent.version)
+            obj["browser"] = "{browser} {version}".format(browser=request.user_agent.browser,
+                                                          version=request.user_agent.version)
             # platform (e.g. windows)
             obj["platform"] = request.user_agent.platform
             # complete user agent string
@@ -194,6 +165,7 @@ class Statistics:
             # exception (if there was one)
             obj["exception"] = None if exception is None else repr(exception)
 
+            obj['rtf'] = obj["response_time"] / ((obj["size"] - 44) // 2 / 16000.0)
             """
             # Gets geo data based of ip
             url = "https://freegeoip.app/json/{0}".format(request.remote_addr)
@@ -213,9 +185,7 @@ class Statistics:
             """
 
             # Adds object to db and saves
-            self.db.session.add(
-                self.model(**obj)
-            )
+            self.db.session.add(self.model(**obj))
             self.db.session.commit()
         except Exception as e:
             self.app.logger.warning("Error in flask-statistics teardown: " + str(e))
