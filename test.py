@@ -28,6 +28,8 @@ class Request(db.Model):
     rtf = db.Column(db.Float)
 
 
+db.session.query(Request).delete()
+db.session.commit()
 db.create_all()
 
 statistics = Statistics(app, db, Request)

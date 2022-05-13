@@ -165,7 +165,8 @@ class Statistics:
             # exception (if there was one)
             obj["exception"] = None if exception is None else repr(exception)
 
-            obj['rtf'] = obj["response_time"] / ((obj["size"] - 44) // 2 / 16000.0)
+            if obj["size"] > 1024 and obj["method"].lower == 'post':
+                obj['rtf'] = obj["response_time"] / ((obj["size"] - 44) // 2 / 16000.0)
             """
             # Gets geo data based of ip
             url = "https://freegeoip.app/json/{0}".format(request.remote_addr)

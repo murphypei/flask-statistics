@@ -33,6 +33,7 @@
           <th>Size</th>
           <th>Duration</th>
           <th>Date</th>
+          <th>Rtf</th>
         </tr>
       </thead>
       <tbody>
@@ -43,17 +44,16 @@
           <td>{{request.mimetype}}</td>
           <td>
             {%- set status = request.status_code -%}
-            {%- if 200 <= status < 300 -%}
-              <span class="text-success">{{status}}</span>
-            {%- elif 400 <= status < 600 -%}
-              <span class="text-danger">{{status}}</span>
-            {%- else -%}
-              {{status}}
-            {%- endif -%}
+            {%- if 200 <= status < 300 -%} <span class="text-success">{{status}}</span>
+              {%- elif 400 <= status < 600 -%} <span class="text-danger">{{status}}</span>
+                {%- else -%}
+                {{status}}
+                {%- endif -%}
           </td>
           <td>{{request.size|filesizeformat}}</td>
           <td>{{request.response_time|round(5)}} s</td>
           <td>{{request.date.strftime("%Y-%m-%d %H:%M:%S")}}</td>
+          <td>{{request.rtf}}</td>
         </tr>
         {%- endfor -%}
       </tbody>
@@ -68,10 +68,10 @@
     let endDate = document.getElementById("endDate").value;
 
     let currentParams = new URLSearchParams(location.search);
-  
+
     currentParams.delete("start");
     currentParams.delete("end");
-  
+
     currentParams.append("start", startDate);
     currentParams.append("end", endDate);
 
@@ -79,7 +79,7 @@
     location.search = currentParams.toString();
   }
 
-  var userChartData = {{user_chart_data|tojson|safe}};
+  var userChartData = {{ user_chart_data| tojson | safe}};
 
   var ctx = document.getElementById("userChart");
   var userChart = new Chart(ctx, {

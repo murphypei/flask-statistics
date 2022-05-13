@@ -37,7 +37,7 @@
 </div>
 
 <div class="row justify-content-md-center">
-  <div class="col-md-10">  
+  <div class="col-md-10">
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -46,6 +46,7 @@
           <th>Unique Hits</th>
           <th>Last requested</th>
           <th>Avg. Duration</th>
+          <th>Avg. Rtf</th>
         </tr>
       </thead>
       <tbody>
@@ -56,6 +57,7 @@
           <td>{{route.unique_hits}}</td>
           <td>{{route.last_requested.strftime("%Y-%m-%d %H:%M:%S")}}</td>
           <td>{{route.average_response_time|round(5)}} s</td>
+          <td>{{route.average_rtf|round(5)}} s</td>
         </tr>
         {%- endfor -%}
       </tbody>
@@ -112,8 +114,6 @@
     margin-bottom: 15px;
     margin-right: 20px;
   }
-
-
 </style>
 
 <script>
@@ -123,10 +123,10 @@
     let endDate = document.getElementById("endDate").value;
 
     let currentParams = new URLSearchParams(location.search);
-  
+
     currentParams.delete("start");
     currentParams.delete("end");
-  
+
     currentParams.append("start", startDate);
     currentParams.append("end", endDate);
 
@@ -134,7 +134,7 @@
     location.search = currentParams.toString();
   }
 
-  var userChartData = {{user_chart_data|tojson|safe}};
+  var userChartData = {{ user_chart_data| tojson | safe}};
 
   var ctx = document.getElementById("userChart");
   var userChart = new Chart(ctx, {
